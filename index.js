@@ -51,6 +51,29 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+
+    const userCollecion=client.db("ass12DB").collection("users")
+    const classesCollecion=client.db("ass12DB").collection("classes")
+    const selectedcClassesCollecion=client.db("ass12DB").collection("selected-classes")
+    const instructorsCollection=client.db("ass12DB").collection("instructors")
+    
+    app.post("/users",async(req,res)=>{
+      const user=req.body;
+      const query={email: user.email}
+      const existingUsers=await userCollecion.findOne(query)
+    if(existingUsers){
+     return res.send({message:"user already exiists"})
+    }
+    const result=await userCollecion.insertOne(user)
+    })
+    
+    app.get("/users",async(req,res)=>{
+      const result=await userCollecion.find().toArray();
+      res.send(result)
+    })
+
+
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
