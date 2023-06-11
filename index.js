@@ -95,7 +95,30 @@ async function run() {
     })
    
     
-   
+    app.patch("/classes/approve/:id",async(req,res)=>{
+      const id=req.params.id;
+      const query={_id:new ObjectId(id)}
+    const updateDocument={
+      $set:{
+        status:"approved"
+      }
+    }
+      const result=await classesCollecion.updateOne(query,updateDocument)
+      res.send(result)
+    })
+    app.patch("/classes/deny/:id",async(req,res)=>{
+      const id=req.params.id;
+      const query={_id:new ObjectId(id)}
+    const updateDocument={
+      $set:{
+        status:"denied"
+      }
+    }
+      const result=await classesCollecion.updateOne(query,updateDocument)
+      res.send(result)
+    })
+
+    
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
