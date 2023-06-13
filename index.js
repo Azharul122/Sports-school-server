@@ -78,6 +78,7 @@ async function run() {
     const classesCollecion = client.db("ass12DB").collection("classes")
     const selectedcClassesCollecion = client.db("ass12DB").collection("selected-classes")
     const instructorsCollection = client.db("ass12DB").collection("instructors")
+    const paymentsCollection = client.db("ass12DB").collection("payments")
 
     app.post("/users", async (req, res) => {
       const user = req.body;
@@ -114,7 +115,7 @@ async function run() {
         clientSecret: paymentIntent.client_secret
       })
     })
-    
+
     app.get('/users/admin/:email', async (req, res) => {
       const toyId = req.params.email;
       const query = { email: toyId };
