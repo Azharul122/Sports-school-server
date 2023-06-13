@@ -116,6 +116,12 @@ async function run() {
       })
     })
 
+    app.post("/payments",async(req,res)=>{
+      const body=req.body
+      const result=await paymentsCollection.insertOne(body)
+      res.send(result)
+    })
+
     app.get('/users/admin/:email', async (req, res) => {
       const toyId = req.params.email;
       const query = { email: toyId };
