@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 require('dotenv').config()
 const jwt = require('jsonwebtoken');
-const stripe=require('stripe')(process.env.PAYMENT_SECRET_KEY)
+const stripe = require('stripe')(process.env.PAYMENT_SECRET_KEY)
 
 const app = express();
 const port = process.env.PORT || 5000
@@ -102,29 +102,34 @@ async function run() {
       res.send(result)
     })
 
-    app.post("/craete-payment-intent",async(req,res)=>{
-      const {price}=req.body;
-      const amount =price*100;
+    app.post("/craete-payment-intent", async (req, res) => {
+      const { price } = req.body;
+      const amount = price * 100;
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amount,
         currency: 'usd',
         payment_method_types: ['card']
       });
-      
+
       res.send({
         clientSecret: paymentIntent.client_secret
       })
     })
-
-    app.post("/payments",async(req,res)=>{
-      const payment=req.body
-      const result=await paymentsCollection.insertOne(payment)
+    app.get("/enrolled/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const result = await paymentsCollection.find(query).toArray()
+      res.send(result)
+    })
+    app.post("/payments", async (req, res) => {
+      const payment = req.body
+      const result = await paymentsCollection.insertOne(payment)
 
       const query = { _id: { $in: payment.cartItems.map(id => new ObjectId(id)) } }
       const deleteResult = await selectedcClassesCollecion.deleteMany(query)
-      res.send({result,deleteResult})
+      res.send({ result, deleteResult })
     })
-    
+
 
     app.get('/users/admin/:email', async (req, res) => {
       const toyId = req.params.email;
