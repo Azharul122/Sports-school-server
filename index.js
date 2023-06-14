@@ -98,7 +98,7 @@ async function run() {
     app.get('/users/:email', async (req, res) => {
       const toyId = req.params.email;
       const query = { email: toyId };
-      const result = await userCollecion.find(query).toArray();
+      const result = await userCollecion.findOne(query);
       res.send(result)
     })
 
@@ -117,10 +117,14 @@ async function run() {
     })
 
     app.post("/payments",async(req,res)=>{
-      const body=req.body
-      const result=await paymentsCollection.insertOne(body)
-      res.send(result)
+      const payment=req.body
+      const result=await paymentsCollection.insertOne(payment)
+
+      const query = { _id: { $in: payment.cartItems.map(id => new ObjectId(id)) } }
+      const deleteResult = await selectedcClassesCollecion.deleteMany(query)
+      res.send({result,deleteResult})
     })
+    
 
     app.get('/users/admin/:email', async (req, res) => {
       const toyId = req.params.email;
@@ -138,6 +142,8 @@ async function run() {
       const result = await classesCollecion.find().toArray();
       res.send(result)
     })
+
+
 
     app.get("/instructors", async (req, res) => {
       const result = await instructorsCollection.find().toArray();
