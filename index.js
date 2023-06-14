@@ -1,6 +1,6 @@
 const express = require("express");
-const cors = require("cors");
 require('dotenv').config()
+const cors = require("cors");
 const jwt = require('jsonwebtoken');
 const stripe = require('stripe')(process.env.PAYMENT_SECRET_KEY)
 
@@ -27,22 +27,6 @@ app.post('/jwt', (req, res) => {
   res.send({ token })
 })
 
-// const verifyJWT = (req, res, next) => {
-//   const authorization = req.headers.authorization;
-//   if (!authorization) {
-//     return res.status(401).send({ error: true, message: 'unauthorized access' });
-//   }
-//   // bearer token
-//   const token = authorization.split(' ')[1];
-
-//   jwt.verify(token, process.env.DB_ACCESS_TOKEN, (err, decoded) => {
-//     if (err) {
-//       return res.status(401).send({ error: true, message: 'unauthorized access' })
-//     }
-//     req.decoded = decoded;
-//     next();
-//   })
-// }
 
 app.get('/', (req, res) => {
   res.send("running")
@@ -123,11 +107,23 @@ async function run() {
     })
     app.post("/payments", async (req, res) => {
       const payment = req.body
+      const {itemId}=payment
       const result = await paymentsCollection.insertOne(payment)
 
       const query = { _id: { $in: payment.cartItems.map(id => new ObjectId(id)) } }
       const deleteResult = await selectedcClassesCollecion.deleteMany(query)
-      res.send({ result, deleteResult })
+
+      const incDec=await classesCollecion.updateMany
+      (
+        {itemId},
+        {
+          $inc:{
+            NOS: 1,
+            avilableSheets:-1
+          }
+        }
+      )
+      res.send({ result, deleteResult ,incDec})
     })
 
 
