@@ -72,6 +72,7 @@ async function run() {
         return res.send({ message: "user already exiists" })
       }
       const result = await userCollecion.insertOne(user)
+      res.send(result)//i
     })
 
     app.get("/users", async (req, res) => {
@@ -109,14 +110,16 @@ async function run() {
     app.post("/payments", async (req, res) => {
       const payment = req.body
       const {itemId}=payment
+
+      console.log(payment)
       const result = await paymentsCollection.insertOne(payment)
 
       const query = { _id: { $in: payment.cartItems.map(id => new ObjectId(id)) } }
       const deleteResult = await selectedcClassesCollecion.deleteMany(query)
 
-      const incDec=await classesCollecion.updateMany
+      const incDec=await classesCollecion.updateOne
       (
-        {itemId},
+        {},
         {
           $inc:{
             NOS: 1,
